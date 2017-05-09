@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">Chromium SWE Updater</string>
+    <string name="updateNotificationText">Updating Chromium SWE</string>
+    <string name="updateFailed">Update Failed</string>
+    <string name="newBuildText">New build available: Build /date/\nClick here to download</string>
+    <string name="noUpdateText">No update available</string>
+    <string name="titleText">Update Chromium SWE</string>
+    <string name="newUpdateNotificationText">Chromium SWE new update</string>
+    <string name="newUpdateNotificationContentText">click for download</string>
+    <string name="permDeniedError">You need to grant the permissions in order to download chromium</string>
+</resources>

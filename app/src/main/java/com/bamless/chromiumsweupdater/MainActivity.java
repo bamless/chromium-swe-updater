@@ -112,7 +112,7 @@ public class MainActivity extends AppCompatActivity {
                             Toast.makeText(MainActivity.this, R.string.updateFailed, Toast.LENGTH_SHORT).show();
                             return;
                         }
-                        if(returnValue) updateStatusText();
+                        updateStatusText();
                         //stop animation
                         ranim.setRepeatCount(0);
                     }

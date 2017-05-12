@@ -85,7 +85,8 @@ public class ChromiumUpdater {
                 SharedPreferences prefs = context.getSharedPreferences(Prefs.BUILD_PREFS, Context.MODE_PRIVATE);
                 BuildTime currBuild = BuildTime.parseBuildTime(prefs.
                         getString(Prefs.BUILD_LASTBUILDINST, Constants.EPOCH));
-                BuildTime buildFromRepo = BuildTime.parseBuildTime(response.body().string());
+                BuildTime buildFromRepo = BuildTime.
+                        parseBuildTime(response.body().string().replace("\n", ""));
 
                 if(currBuild.compareTo(buildFromRepo) < 0) {
                     prefs.edit().putString(Prefs.BUILD_LASTBUILDFETCHED, buildFromRepo.toString()).commit();

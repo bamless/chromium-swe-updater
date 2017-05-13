@@ -33,29 +33,33 @@ import com.bamless.chromiumsweupdater.utils.Prefs;
 
 import java.util.Calendar;
 
-
 public class MainActivity extends AppCompatActivity {
     public final static String TAG = "MainActivity";
+
     /**Permission request code*/
     public final static int REQUEST_EXTERNAL_WRITE = 1;
-
     /**Argument key. Boolean indicating wheter to reset the {@link com.bamless.chromiumsweupdater.updater.AlarmReceiver}*/
     public final static String ARG_START_ALARM_ON_OPEN = "startAlarmOnOpen";
-    /**The notification used to show download progress*/
-    private ProgressNotification notification;
+
+    /**The progressNotification used to show download progress*/
+    private ProgressNotification progressNotification;
     private ChromiumUpdater cu;
-    private ImageButton refreshbtn;
+    private ImageButton checkUpdateButton;
+
     /**{@link android.view.View.OnClickListener} to start the update*/
     private View.OnClickListener startUpdateOnClickListener = new View.OnClickListener() {
-        public void onClick(View v) {
+        public void onClick(final View v) {
             v.setOnClickListener(null);
-            notification.start();
-            cu.update(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), notification, new ChromiumUpdater.ReturnCallback<Boolean>() {
+            progressNotification.start();
+
+            cu.update(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), progressNotification, new ChromiumUpdater.ReturnCallback<Boolean>() {
                 public void onReturn(Boolean returnValue) {
-                    if(returnValue)
-                        updateStatusText();
-                    else
+                    if(returnValue) {
+                        //update succeeded, change status text to "no update available"
+                        updateStatusText(false);
+                    } else {
                         updateFailed();
+                    }
                 }
             });
         }
@@ -81,30 +85,32 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         cu = new ChromiumUpdater(this);
-        notification = new ProgressNotification(this, getString(R.string.updateNotificationText));
+        progressNotification = new ProgressNotification(this, getString(R.string.updateNotificationText));
 
         //checks the external write permissions
         checkPermissions();
         //check arguments
         checkArguments();
         //creates and setup refresh button
-        createRefreshButton();
-        //updates the status text
-        updateStatusText();
+        createCheckUpdateButton();
+        //setup the status text with default value
+        updateStatusText(false);
+        //checks for an update at application start
+        checkUpdateButton.performClick();
     }
 
-    /**Setup the refresh button*/
-    private void createRefreshButton() {
-        final ImageButton refreshbtn = (ImageButton) findViewById(R.id.refreshButton);
+    /**Setup the check update button*/
+    private void createCheckUpdateButton() {
+        checkUpdateButton = (ImageButton) findViewById(R.id.refreshButton);
         final RotateAnimation ranim = (RotateAnimation) AnimationUtils.loadAnimation(this, R.anim.rotate);
 
         //set listener to check for update
-        refreshbtn.setOnClickListener(new View.OnClickListener() {
+        checkUpdateButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 //start refresh button animation (if not already started)
-                Animation anim = refreshbtn.getAnimation();
+                Animation anim = checkUpdateButton.getAnimation();
                 if(anim == null || !anim.hasStarted())
-                    refreshbtn.startAnimation(ranim);
+                    checkUpdateButton.startAnimation(ranim);
 
                 cu.checkForUpdate(new ChromiumUpdater.ReturnCallback<Boolean>() {
                     public void onReturn(Boolean returnValue) {
@@ -112,7 +118,7 @@ public class MainActivity extends AppCompatActivity {
                             Toast.makeText(MainActivity.this, R.string.updateFailed, Toast.LENGTH_SHORT).show();
                             return;
                         }
-                        updateStatusText();
+                        updateStatusText(returnValue);
                         //stop animation
                         ranim.setRepeatCount(0);
                     }
@@ -121,16 +127,19 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    /**Updates the status text*/
-    private void updateStatusText() {
-        final TextView updateStatusText = (TextView) findViewById(R.id.updateStatusText);
-        SharedPreferences prefs = getSharedPreferences(Prefs.BUILD_PREFS, Context.MODE_PRIVATE);
-        BuildTime curr = BuildTime.parseBuildTime(prefs.getString(Prefs.BUILD_LASTBUILDINST, Constants.EPOCH));
-        BuildTime last = BuildTime.parseBuildTime(prefs.getString(Prefs.BUILD_LASTBUILDFETCHED, Constants.EPOCH));
+    /**
+     * Updates the status text
+     * @param isUpdateAvailable whether or not there is a new update
+     */
+    private void updateStatusText(boolean isUpdateAvailable) {
+        TextView updateStatusText = (TextView) findViewById(R.id.updateStatusText);
 
         //If there is a new build
-        if(curr.compareTo(last) < 0) {
+        if(isUpdateAvailable) {
             //Update text with new build info, change color, add underline and set update listener
+            SharedPreferences prefs = getSharedPreferences(Prefs.BUILD_PREFS, Context.MODE_PRIVATE);
+            BuildTime last = BuildTime.parseBuildTime(prefs.getString(Prefs.BUILD_LASTBUILDFETCHED, Constants.EPOCH));
+
             String newBuildText = getResources().getString(R.string.newBuildText);
             updateStatusText.setText(newBuildText.replace("/date/", last.dateToString()));
             updateStatusText.setTextColor(Color.BLUE);
@@ -159,6 +168,7 @@ public class MainActivity extends AppCompatActivity {
         Bundle extras = getIntent().getExtras();
         boolean restartAlarm = extras == null || extras.getBoolean(ARG_START_ALARM_ON_OPEN, true);
         Log.d(TAG, ARG_START_ALARM_ON_OPEN + ": " + restartAlarm);
+
         if(restartAlarm) startAlarm();
     }
 
@@ -181,8 +191,11 @@ public class MainActivity extends AppCompatActivity {
 
     /**Called upon update failure*/
     private void updateFailed() {
+        //the update failed, reset status text to last build available for download
         Toast.makeText(MainActivity.this, R.string.updateFailed, Toast.LENGTH_SHORT).show();
-        updateStatusText();
+        updateStatusText(true);
+        //dismiss progress notification
+        progressNotification.cancel();
     }
 
     /**Returns the result of the permission request. If the WRITE permissions on external storage was
@@ -202,7 +215,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        notification.destroy();
+        progressNotification.destroy();
         super.onDestroy();
     }
 }

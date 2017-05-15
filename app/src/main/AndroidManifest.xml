@@ -21,10 +21,10 @@
                 android:resource="@xml/provider_paths"/>
         </provider>
 
-        <service android:name="com.bamless.chromiumsweupdater.updater.KillNotificationsService"></service>
+        <service android:name="com.bamless.chromiumsweupdater.ui.KillNotificationsService"></service>
         <service android:name="com.bamless.chromiumsweupdater.updater.CheckUpdateService"></service>
 
-        <activity android:name="com.bamless.chromiumsweupdater.MainActivity">
+        <activity android:name="com.bamless.chromiumsweupdater.ui.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

@@ -1,4 +1,4 @@
-package com.bamless.chromiumsweupdater;
+package com.bamless.chromiumsweupdater.ui;
 
 import android.Manifest;
 import android.app.AlarmManager;
@@ -24,9 +24,9 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bamless.chromiumsweupdater.R;
 import com.bamless.chromiumsweupdater.updater.AlarmReceiver;
 import com.bamless.chromiumsweupdater.updater.ChromiumUpdater;
-import com.bamless.chromiumsweupdater.updater.ProgressNotification;
 import com.bamless.chromiumsweupdater.utils.BuildTime;
 import com.bamless.chromiumsweupdater.utils.Constants;
 import com.bamless.chromiumsweupdater.utils.Prefs;

@@ -1,4 +1,4 @@
-package com.bamless.chromiumsweupdater.updater;
+package com.bamless.chromiumsweupdater.ui;
 
 import android.app.NotificationManager;
 import android.app.Service;
@@ -17,15 +17,13 @@ public class KillNotificationsService extends Service {
         public KillBinder(Service service) {
             this.service = service;
         }
-
     }
 
-    private NotificationManager nm;
-    private final IBinder mBinder = new KillBinder(this);
+    private final IBinder binder = new KillBinder(this);
 
     @Override
     public IBinder onBind(Intent intent) {
-        return mBinder;
+        return binder;
     }
 
     @Override
@@ -35,7 +33,7 @@ public class KillNotificationsService extends Service {
 
     @Override
     public void onCreate() {
-        nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        NotificationManager nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         nm.cancelAll();
         stopSelf();
     }

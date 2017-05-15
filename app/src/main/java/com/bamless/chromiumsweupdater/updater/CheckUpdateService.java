@@ -11,7 +11,7 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.NotificationCompat;
 import android.util.Log;
 
-import com.bamless.chromiumsweupdater.MainActivity;
+import com.bamless.chromiumsweupdater.ui.MainActivity;
 import com.bamless.chromiumsweupdater.R;
 
 /**
@@ -43,7 +43,7 @@ public class CheckUpdateService extends Service {
             }
         });
         Log.d(TAG, "notify update");
-        return Service.START_NOT_STICKY;
+        return Service.START_STICKY;
     }
 
     private void showUpdateNotification() {

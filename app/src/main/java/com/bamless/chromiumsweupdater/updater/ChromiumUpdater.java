@@ -15,6 +15,7 @@ import com.bamless.chromiumsweupdater.utils.Constants;
 import com.bamless.chromiumsweupdater.utils.Prefs;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import okhttp3.Call;
@@ -133,7 +134,7 @@ public class ChromiumUpdater {
                     File out = new File(downloadPath, CHROMIUM_SWE_APK);
                     sink = Okio.buffer(Okio.sink(out));
                     sink.writeAll(response.body().source());
-                } catch (Exception e) {
+                } catch (IOException e) {
                     Log.e(TAG, "Error while writing the file", e);
                     returnOnUIThread(returnCallback, false);
                     return;

@@ -140,8 +140,8 @@ public class MainActivity extends AppCompatActivity {
             SharedPreferences prefs = getSharedPreferences(Prefs.BUILD_PREFS, Context.MODE_PRIVATE);
             BuildTime last = BuildTime.parseBuildTime(prefs.getString(Prefs.BUILD_LASTBUILDFETCHED, Constants.EPOCH));
 
-            String newBuildText = getResources().getString(R.string.newBuildText);
-            updateStatusText.setText(newBuildText.replace("/date/", last.dateToString()));
+            String newBuildText = getResources().getString(R.string.newBuildText, last.dateToString());
+            updateStatusText.setText(newBuildText);
             updateStatusText.setTextColor(Color.BLUE);
             updateStatusText.setPaintFlags(updateStatusText.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
             //set onclick listener to start update

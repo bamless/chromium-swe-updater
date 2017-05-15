@@ -30,14 +30,14 @@ import okio.Okio;
  * Class that implements logic for checking and downloading Chromium for SWE updates
  */
 public class ChromiumUpdater {
-    public final static String TAG = "ChromiumUpdater";
+    private final static String TAG = "ChromiumUpdater";
 
     /**Base address*/
-    public final static String REPO = "https://github.com/bamless/chromium-swe-builds/raw/master/";
+    private final static String REPO = "https://github.com/bamless/chromium-swe-builds/raw/master/";
     /**Name of the APK*/
-    public final static String CHROMIUM_SWE_APK = "chromium-swe.apk";
+    private final static String CHROMIUM_SWE_APK = "chromium-swe.apk";
     /**Name of the build file containing date and hour of last build*/
-    public final static String BUILD_FILE = "build";
+    private final static String BUILD_FILE = "build";
 
     /**Downloading progress listener*/
     private ProgressResponseBody.ProgressListener progressListener;
@@ -89,7 +89,7 @@ public class ChromiumUpdater {
                         parseBuildTime(response.body().string().replace("\n", ""));
 
                 if(currBuild.compareTo(buildFromRepo) < 0) {
-                    prefs.edit().putString(Prefs.BUILD_LASTBUILDFETCHED, buildFromRepo.toString()).commit();
+                    prefs.edit().putString(Prefs.BUILD_LASTBUILDFETCHED, buildFromRepo.toString()).apply();
                     returnOnUIThread(returnCallback, true);
                 } else {
                     returnOnUIThread(returnCallback, false);
@@ -146,7 +146,7 @@ public class ChromiumUpdater {
                 //update last installation time
                 SharedPreferences prefs = context.getSharedPreferences(Prefs.BUILD_PREFS, Context.MODE_PRIVATE);
                 prefs.edit().putString(Prefs.BUILD_LASTBUILDINST, prefs.
-                        getString(Prefs.BUILD_LASTBUILDFETCHED, Constants.EPOCH)).commit();
+                        getString(Prefs.BUILD_LASTBUILDFETCHED, Constants.EPOCH)).apply();
 
                 returnOnUIThread(returnCallback, true);
             }
@@ -158,7 +158,7 @@ public class ChromiumUpdater {
         File apk = new File(downloadPath, ChromiumUpdater.CHROMIUM_SWE_APK);
         Intent intent = new Intent(Intent.ACTION_VIEW);
 
-        Uri uri = null;
+        Uri uri;
         if(android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             uri = FileProvider.getUriForFile(context, context.getApplicationContext()
                     .getPackageName() + ".provider", apk);

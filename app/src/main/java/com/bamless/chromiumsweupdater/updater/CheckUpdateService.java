@@ -56,7 +56,7 @@ public class CheckUpdateService extends Service {
         notBuilder.setContentTitle(getString(R.string.newUpdateNotificationText))
                 .setContentText(getString(R.string.newUpdateNotificationContentText))
                 .setSmallIcon(R.mipmap.ic_update_black)
-                .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.chromiumswe64px))
+                .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.chromiumsweupdater))
                 .setDefaults(-1 )
                 .setAutoCancel(true)
                 .setContentIntent(intent);

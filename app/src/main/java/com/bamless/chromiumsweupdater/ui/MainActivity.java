@@ -92,7 +92,7 @@ public class MainActivity extends AppCompatActivity {
         createCheckUpdateButton();
         //setup the status text with default value
         updateStatusText();
-        //checks for an update at application start
+        //checks for update at application start
         checkUpdateButton.performClick();
     }
 
@@ -116,7 +116,6 @@ public class MainActivity extends AppCompatActivity {
                             return;
                         }
                         updateStatusText();
-                        //stop animation
                         ranim.setRepeatCount(0);
                     }
                 });

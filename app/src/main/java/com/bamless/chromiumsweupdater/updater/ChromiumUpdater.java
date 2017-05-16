@@ -68,10 +68,11 @@ public class ChromiumUpdater {
     /**
      * It checks if an update is available (asynchronously) from the repo updating the date of the
      * latest build available. The returncallback's method gets called on the UI thread if the context
-     * passed at instan tiation is an {@link Activity}. This method must be called before {@link ChromiumUpdater#update(File, ProgressResponseBody.ProgressListener, ReturnCallback)}
+     * passed at instan tiation is an {@link Activity}. This method should be called before
+     * {@link ChromiumUpdater#update(File, ProgressResponseBody.ProgressListener, ReturnCallback)}
      * is called.
      * @param returnCallback Callback for returning a value. It returns true if there is an update,
-     *                       false if not. returns null if update failed.
+     *                       false if not. returns null if check failed.
      * @see ChromiumUpdater#getLatestBuildDate()
      */
     public void checkForUpdate(final ReturnCallback<Boolean> returnCallback) {
@@ -115,7 +116,7 @@ public class ChromiumUpdater {
      * execute and fails.
      * @param downloadPath The patch to which the apk will be downloaded
      * @param progressListener listener for the download progress
-     * @param returnCallback callback for returning a value. It returns true if the download succeeded,
+     * @param returnCallback callback for returning a value. It returns true if the update succeeded,
      *                       false if it failed.
      */
     public void update(final File downloadPath, ProgressResponseBody.ProgressListener progressListener,
@@ -192,7 +193,7 @@ public class ChromiumUpdater {
     /**
      * Returns the latest build time and date in a {@link BuildDate} object.
      * The {@link BuildDate} returned is the last date fetched from the repo by the last
-     * {@link ChromiumUpdater#update(File, ProgressResponseBody.ProgressListener, ReturnCallback)}.
+     * {@link ChromiumUpdater#checkForUpdate(ReturnCallback)} call.
      * @return the latest build time and date in a {@link BuildDate} object.
      * @see ChromiumUpdater#update(File, ProgressResponseBody.ProgressListener, ReturnCallback)
      */

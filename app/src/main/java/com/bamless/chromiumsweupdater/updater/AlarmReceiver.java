@@ -10,7 +10,7 @@ import android.util.Log;
  * {@link CheckUpdateService} service.
  */
 public class AlarmReceiver extends BroadcastReceiver {
-    public final static String TAG = "AlarmReceiver";
+    public final static String TAG = AlarmReceiver.class.getSimpleName();
 
     @Override
     public void onReceive(Context context, Intent intent) {

@@ -27,14 +27,13 @@ import android.widget.Toast;
 import com.bamless.chromiumsweupdater.R;
 import com.bamless.chromiumsweupdater.updater.AlarmReceiver;
 import com.bamless.chromiumsweupdater.updater.ChromiumUpdater;
-import com.bamless.chromiumsweupdater.utils.BuildTime;
+import com.bamless.chromiumsweupdater.utils.BuildDate;
 import com.bamless.chromiumsweupdater.utils.Constants;
-import com.bamless.chromiumsweupdater.utils.Prefs;
 
 import java.util.Calendar;
 
 public class MainActivity extends AppCompatActivity {
-    public final static String TAG = "MainActivity";
+    public final static String TAG = MainActivity.class.getSimpleName();
 
     /**Permission request code*/
     public final static int REQUEST_EXTERNAL_WRITE = 1;
@@ -54,12 +53,10 @@ public class MainActivity extends AppCompatActivity {
 
             cu.update(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), progressNotification, new ChromiumUpdater.ReturnCallback<Boolean>() {
                 public void onReturn(Boolean returnValue) {
-                    if(returnValue) {
-                        //update succeeded, change status text to "no update available"
-                        updateStatusText(false);
-                    } else {
+                    if(returnValue)
+                        updateStatusText();
+                    else
                         updateFailed();
-                    }
                 }
             });
         }
@@ -94,7 +91,7 @@ public class MainActivity extends AppCompatActivity {
         //creates and setup refresh button
         createCheckUpdateButton();
         //setup the status text with default value
-        updateStatusText(false);
+        updateStatusText();
         //checks for an update at application start
         checkUpdateButton.performClick();
     }
@@ -118,7 +115,7 @@ public class MainActivity extends AppCompatActivity {
                             Toast.makeText(MainActivity.this, R.string.updateFailed, Toast.LENGTH_SHORT).show();
                             return;
                         }
-                        updateStatusText(returnValue);
+                        updateStatusText();
                         //stop animation
                         ranim.setRepeatCount(0);
                     }
@@ -127,19 +124,15 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    /**
-     * Updates the status text
-     * @param isUpdateAvailable whether or not there is a new update
-     */
-    private void updateStatusText(boolean isUpdateAvailable) {
+    /**Updates the status text*/
+    private void updateStatusText() {
         TextView updateStatusText = (TextView) findViewById(R.id.updateStatusText);
+        BuildDate curr = cu.getInstalledBuildDate();
+        BuildDate last = cu.getLatestBuildDate();
 
         //If there is a new build
-        if(isUpdateAvailable) {
+        if(curr.compareTo(last) < 0) {
             //Update text with new build info, change color, add underline and set update listener
-            SharedPreferences prefs = getSharedPreferences(Prefs.BUILD_PREFS, Context.MODE_PRIVATE);
-            BuildTime last = BuildTime.parseBuildTime(prefs.getString(Prefs.BUILD_LASTBUILDFETCHED, Constants.EPOCH));
-
             String newBuildText = getResources().getString(R.string.newBuildText, last.dateToString());
             updateStatusText.setText(newBuildText);
             updateStatusText.setTextColor(Color.BLUE);
@@ -193,7 +186,7 @@ public class MainActivity extends AppCompatActivity {
     private void updateFailed() {
         //the update failed, reset status text to last build available for download
         Toast.makeText(MainActivity.this, R.string.updateFailed, Toast.LENGTH_SHORT).show();
-        updateStatusText(true);
+        updateStatusText();
         //dismiss progress notification
         progressNotification.cancel();
     }

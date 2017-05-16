@@ -10,12 +10,10 @@ import android.support.v4.content.FileProvider;
 import android.util.Log;
 
 import com.bamless.chromiumsweupdater.http.ProgressResponseBody;
-import com.bamless.chromiumsweupdater.utils.BuildTime;
+import com.bamless.chromiumsweupdater.utils.BuildDate;
 import com.bamless.chromiumsweupdater.utils.Constants;
-import com.bamless.chromiumsweupdater.utils.Prefs;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import okhttp3.Call;
@@ -31,7 +29,12 @@ import okio.Okio;
  * Class that implements logic for checking and downloading Chromium for SWE updates
  */
 public class ChromiumUpdater {
-    private final static String TAG = "ChromiumUpdater";
+    private final static String TAG = ChromiumUpdater.class.getSimpleName();
+
+    /**Shared prefs name and shared prefs keys*/
+    private static final String BUILD_PREFS = "buildPrefs";
+    private static final String BUILD_LASTBUILD_INST = "lastbuild";
+    private static final String BUILD_LASTBUILD_FETCHED = "lastbuildFetched";
 
     /**Base address*/
     private final static String REPO = "https://github.com/bamless/chromium-swe-builds/raw/master/";
@@ -63,10 +66,13 @@ public class ChromiumUpdater {
     }
 
     /**
-     * It checks if an update is available (asynchronously). The returncallback's method gets called
-     * on the UI thread if the context passed at instantiation is an {@link Activity}.
+     * It checks if an update is available (asynchronously) from the repo updating the date of the
+     * latest build available. The returncallback's method gets called on the UI thread if the context
+     * passed at instan tiation is an {@link Activity}. This method must be called before {@link ChromiumUpdater#update(File, ProgressResponseBody.ProgressListener, ReturnCallback)}
+     * is called.
      * @param returnCallback Callback for returning a value. It returns true if there is an update,
      *                       false if not. returns null if update failed.
+     * @see ChromiumUpdater#getLatestBuildDate()
      */
     public void checkForUpdate(final ReturnCallback<Boolean> returnCallback) {
         setProgressListener(null);
@@ -77,20 +83,23 @@ public class ChromiumUpdater {
         http.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                e.printStackTrace();
+                Log.e(TAG, "Failed to check the update", e);
                 returnOnUIThread(returnCallback, null);
             }
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-                SharedPreferences prefs = context.getSharedPreferences(Prefs.BUILD_PREFS, Context.MODE_PRIVATE);
-                BuildTime currBuild = BuildTime.parseBuildTime(prefs.
-                        getString(Prefs.BUILD_LASTBUILDINST, Constants.EPOCH));
-                BuildTime buildFromRepo = BuildTime.
-                        parseBuildTime(response.body().string().replace("\n", ""));
+                if(response == null) {
+                    Log.e(TAG, "Failed to check the update");
+                    returnOnUIThread(returnCallback, null);
+                    return;
+                }
+
+                BuildDate currBuild = getInstalledBuildDate();
+                BuildDate buildFromRepo = BuildDate.parseBuildTime(response.body().string().replace("\n", ""));
 
                 if(currBuild.compareTo(buildFromRepo) < 0) {
-                    prefs.edit().putString(Prefs.BUILD_LASTBUILDFETCHED, buildFromRepo.toString()).apply();
+                    setLatestBuildDate(buildFromRepo);
                     returnOnUIThread(returnCallback, true);
                 } else {
                     returnOnUIThread(returnCallback, false);
@@ -100,8 +109,10 @@ public class ChromiumUpdater {
     }
 
     /**
-     * Downloads and install the Chromium SWE apk (asynchronously). returncallback's method gets called
-     * on the UI thread if the context passed at instantiation is an {@link Activity}.
+     * Downloads and install the latest Chromium SWE apk (asynchronously). returncallback's method gets
+     * called on the UI thread if the context passed at instantiation is an {@link Activity}.
+     * If the latest build date fetched is not newer than the build installed, the function do not
+     * execute and fails.
      * @param downloadPath The patch to which the apk will be downloaded
      * @param progressListener listener for the download progress
      * @param returnCallback callback for returning a value. It returns true if the download succeeded,
@@ -109,6 +120,12 @@ public class ChromiumUpdater {
      */
     public void update(final File downloadPath, ProgressResponseBody.ProgressListener progressListener,
                        final ReturnCallback<Boolean> returnCallback) {
+        //stops if the latest build is not newer than the installed
+        if(!(getInstalledBuildDate().compareTo(getLatestBuildDate()) < 0)) {
+            returnCallback.onReturn(false);
+            return;
+        }
+
         setProgressListener(progressListener);
         Request request = new Request.Builder()
                             .url(REPO + CHROMIUM_SWE_APK)
@@ -144,10 +161,8 @@ public class ChromiumUpdater {
 
                 installUpdate(downloadPath);
 
-                //update last installation time
-                SharedPreferences prefs = context.getSharedPreferences(Prefs.BUILD_PREFS, Context.MODE_PRIVATE);
-                prefs.edit().putString(Prefs.BUILD_LASTBUILDINST, prefs.
-                        getString(Prefs.BUILD_LASTBUILDFETCHED, Constants.EPOCH)).apply();
+                //update last installation time and latest build time
+                setInstalledBuildDate(getLatestBuildDate());
 
                 returnOnUIThread(returnCallback, true);
             }
@@ -172,6 +187,36 @@ public class ChromiumUpdater {
         intent.setDataAndType(uri, "application/vnd.android.package-archive");
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(intent);
+    }
+
+    /**
+     * Returns the latest build time and date in a {@link BuildDate} object.
+     * The {@link BuildDate} returned is the last date fetched from the repo by the last
+     * {@link ChromiumUpdater#update(File, ProgressResponseBody.ProgressListener, ReturnCallback)}.
+     * @return the latest build time and date in a {@link BuildDate} object.
+     * @see ChromiumUpdater#update(File, ProgressResponseBody.ProgressListener, ReturnCallback)
+     */
+    public BuildDate getLatestBuildDate() {
+        SharedPreferences prefs = context.getSharedPreferences(BUILD_PREFS, Context.MODE_PRIVATE);
+        return BuildDate.parseBuildTime(prefs.getString(BUILD_LASTBUILD_FETCHED, Constants.EPOCH));
+    }
+
+    /**
+     * @return the build time and date of the last build installed in a {@link BuildDate} object.
+     */
+    public BuildDate getInstalledBuildDate() {
+        SharedPreferences prefs = context.getSharedPreferences(BUILD_PREFS, Context.MODE_PRIVATE);
+        return BuildDate.parseBuildTime(prefs.getString(BUILD_LASTBUILD_INST, Constants.EPOCH));
+    }
+
+    private void setLatestBuildDate(BuildDate buildDate) {
+        SharedPreferences prefs = context.getSharedPreferences(BUILD_PREFS, Context.MODE_PRIVATE);
+        prefs.edit().putString(BUILD_LASTBUILD_FETCHED, buildDate.toString()).apply();
+    }
+
+    private void setInstalledBuildDate(BuildDate buildDate) {
+        SharedPreferences prefs = context.getSharedPreferences(BUILD_PREFS, Context.MODE_PRIVATE);
+        prefs.edit().putString(BUILD_LASTBUILD_INST, buildDate.toString()).apply();
     }
 
     /**

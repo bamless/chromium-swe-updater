@@ -18,7 +18,7 @@ import com.bamless.chromiumsweupdater.R;
  * Service that checks if an update is available, and notifies if it is.
  */
 public class CheckUpdateService extends Service {
-    public final static String TAG = "CheckUpdateService";
+    public final static String TAG = CheckUpdateService.class.getSimpleName();
     /**The notification's ID*/
     private final static int NOTID = 500;
     private ChromiumUpdater updater;

@@ -5,7 +5,7 @@ import android.support.annotation.NonNull;
 /**
  * Class that represent a build timestamp.
  */
-public class BuildTime implements Comparable<BuildTime> {
+public class BuildDate implements Comparable<BuildDate> {
     private int day = 1;
     private int month = 1;
     private int year = 1970;
@@ -14,10 +14,10 @@ public class BuildTime implements Comparable<BuildTime> {
     private int min = 0;
     private int sec = 0;
 
-    protected BuildTime() {
+    protected BuildDate() {
     }
 
-    public BuildTime(int day, int month, int year, int hour, int min, int sec) {
+    public BuildDate(int day, int month, int year, int hour, int min, int sec) {
         setDay(day);
         setMonth(month);
         setYear(year);
@@ -26,8 +26,8 @@ public class BuildTime implements Comparable<BuildTime> {
         setSec(sec);
     }
 
-    public static BuildTime parseBuildTime(String buildtime) {
-        BuildTime bt = new BuildTime();
+    public static BuildDate parseBuildTime(String buildtime) {
+        BuildDate bt = new BuildDate();
 
         String[] datetime = buildtime.split(" ");
         if(datetime.length != 2)
@@ -113,7 +113,7 @@ public class BuildTime implements Comparable<BuildTime> {
     }
 
     @Override
-    public int compareTo(@NonNull BuildTime o) {
+    public int compareTo(@NonNull BuildDate o) {
         int res = 0;
         if((res = year - o.year) != 0) return res;
         if((res = month - o.month) != 0) return res;

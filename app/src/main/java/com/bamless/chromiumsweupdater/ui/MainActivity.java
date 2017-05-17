@@ -5,7 +5,6 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -17,10 +16,6 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
-import android.view.animation.RotateAnimation;
-import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -32,25 +27,32 @@ import com.bamless.chromiumsweupdater.utils.Constants;
 
 import java.util.Calendar;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+
 public class MainActivity extends AppCompatActivity {
     public final static String TAG = MainActivity.class.getSimpleName();
 
     /**Permission request code*/
     public final static int REQUEST_EXTERNAL_WRITE = 1;
-    /**Argument key. Boolean indicating wheter to reset the {@link com.bamless.chromiumsweupdater.updater.AlarmReceiver}*/
+    /**Argument key. Boolean indicating whether to reset the {@link com.bamless.chromiumsweupdater.updater.AlarmReceiver}*/
     public final static String ARG_START_ALARM_ON_OPEN = "startAlarmOnOpen";
 
     /**The progressNotification used to show download progress*/
     private ProgressNotification progressNotification;
+    /**The ChromiumUupdater used to check and update Chromium SWE*/
     private ChromiumUpdater cu;
-    private ImageButton checkUpdateButton;
+    /**The button that checks the update on click*/
+    @BindView(R.id.checkUpdateButton)
+    protected AnimatedImageButton checkUpdateButton;
 
     /**{@link android.view.View.OnClickListener} to start the update*/
     private View.OnClickListener startUpdateOnClickListener = new View.OnClickListener() {
         public void onClick(final View v) {
-            v.setOnClickListener(null);
-            progressNotification.start();
-
+            v.setOnClickListener(null);     //remove the listener once update started
+            progressNotification.start();   //start update notification
+            //start the actual update
             cu.update(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), progressNotification, new ChromiumUpdater.ReturnCallback<Boolean>() {
                 public void onReturn(Boolean returnValue) {
                     if(returnValue)
@@ -80,6 +82,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        ButterKnife.bind(this);
 
         cu = new ChromiumUpdater(this);
         progressNotification = new ProgressNotification(this, getString(R.string.updateNotificationText));
@@ -88,44 +91,29 @@ public class MainActivity extends AppCompatActivity {
         checkPermissions();
         //check arguments
         checkArguments();
-        //creates and setup refresh button
-        createCheckUpdateButton();
-        //setup the status text with default value
+        //init the status text
         updateStatusText();
         //checks for update at application start
         checkUpdateButton.performClick();
     }
 
-    /**Setup the check update button*/
-    private void createCheckUpdateButton() {
-        checkUpdateButton = (ImageButton) findViewById(R.id.refreshButton);
-        final RotateAnimation ranim = (RotateAnimation) AnimationUtils.loadAnimation(this, R.anim.rotate);
-
-        //set listener to check for update
-        checkUpdateButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                //start refresh button animation (if not already started)
-                Animation anim = checkUpdateButton.getAnimation();
-                if(anim == null || !anim.hasStarted())
-                    checkUpdateButton.startAnimation(ranim);
-
-                cu.checkForUpdate(new ChromiumUpdater.ReturnCallback<Boolean>() {
-                    public void onReturn(Boolean returnValue) {
-                        if(returnValue == null) {
-                            Toast.makeText(MainActivity.this, R.string.updateFailed, Toast.LENGTH_SHORT).show();
-                            return;
-                        }
-                        updateStatusText();
-                        ranim.setRepeatCount(0);
-                    }
-                });
+    @OnClick(R.id.checkUpdateButton)
+    protected void checkUpdateOnClick(final AnimatedImageButton b) {
+        cu.checkForUpdate(new ChromiumUpdater.ReturnCallback<Boolean>() {
+            public void onReturn(Boolean returnValue) {
+                if(returnValue == null) {
+                    Toast.makeText(MainActivity.this, R.string.updateFailed, Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                updateStatusText();
+                b.stopButtonAnimationSmooth();
             }
         });
     }
 
     /**Updates the status text*/
     private void updateStatusText() {
-        TextView updateStatusText = (TextView) findViewById(R.id.updateStatusText);
+        TextView updateStatusText = ButterKnife.findById(this, R.id.updateStatusText);
         BuildDate curr = cu.getInstalledBuildDate();
         BuildDate last = cu.getLatestBuildDate();
 

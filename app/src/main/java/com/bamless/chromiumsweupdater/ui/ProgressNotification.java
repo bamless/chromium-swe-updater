@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.graphics.BitmapFactory;
 import android.os.IBinder;
+import android.os.SystemClock;
 import android.support.v7.app.NotificationCompat;
 
 import com.bamless.chromiumsweupdater.R;
@@ -19,17 +20,18 @@ import java.util.Locale;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Notification used to show download progress. To be used with an {@link okhttp3.OkHttpClient} using
- * a {@link ProgressResponseBody}.
+ * Notification used to show download progress. To be used with an {@link okhttp3.OkHttpClient} that
+ * uses a {@link ProgressResponseBody}.
  */
 public class ProgressNotification implements ProgressResponseBody.ProgressListener {
     /**Update interval (in milliseconds)*/
     private static final int UPDATE_INTERVAL = 500;
 
     private Context ctx;
-    private ServiceConnection connection;
     private NotificationManager notManager;
     private NotificationCompat.Builder notBuilder;
+    /**Connection for {@link KillNotificationsService}*/
+    private ServiceConnection connection;
 
     private String title;
     private int notificationID;
@@ -49,13 +51,18 @@ public class ProgressNotification implements ProgressResponseBody.ProgressListen
     }
 
     private void init() {
+        //set static content of notification
         notBuilder.setContentTitle(this.title)
                 .setContentText("0%")
                 .setOngoing(true)
                 .setLargeIcon(BitmapFactory.decodeResource(ctx.getResources(), R.drawable.chromiumsweupdater64px))
                 .setSmallIcon(R.mipmap.ic_update_black);
+        //init notification progress to 0
         notBuilder.setProgress(100, 0, false);
-        //init the service used to dismiss the notification upon app closure
+        /*init the service used to dismiss the notification upon app closure. This is necessary
+        because we're not guaranteed Activity#onDestroy will be called on app closure (from task list).
+        This service, on the other hand, is going to wake up as soon as the app is removed from the
+        task list and will dismiss the notification*/
         connection = new ServiceConnection() {
             public void onServiceConnected(ComponentName className, IBinder binder) {
                 ((KillNotificationsService.KillBinder) binder).service.startService(new Intent(
@@ -71,7 +78,7 @@ public class ProgressNotification implements ProgressResponseBody.ProgressListen
 
     /**Resets the state of the notification and shows it*/
     public void start() {
-        startTime = System.currentTimeMillis();
+        startTime = SystemClock.elapsedRealtime();
         lastUpdate = 0;
         update(0, 0, false);
     }
@@ -84,7 +91,7 @@ public class ProgressNotification implements ProgressResponseBody.ProgressListen
     @Override
     public void update(long bytesRead, long contentLength, boolean done) {
         int percent = (int) (((float) bytesRead / contentLength) * 100);
-        long elapsedTimeMillis = System.currentTimeMillis() - startTime;
+        long elapsedTimeMillis = SystemClock.elapsedRealtime() - startTime;
         float downRate = elapsedTimeMillis == 0 ? 0 : ((float) bytesRead / (elapsedTimeMillis / 1000f));
         int timeRemaining = (int) ((double) (contentLength - bytesRead) / downRate);
 
@@ -103,7 +110,7 @@ public class ProgressNotification implements ProgressResponseBody.ProgressListen
      * limit the updating of the text (if the text gets updated too frequently it gets difficult to read).
      */
     private boolean canUpdate() {
-        long curr = System.currentTimeMillis();
+        long curr = SystemClock.elapsedRealtime();
         if(curr - lastUpdate >= UPDATE_INTERVAL) {
             lastUpdate = curr;
             return true;

@@ -2,6 +2,7 @@
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:custom="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.bamless.chromiumsweupdater.ui.MainActivity"
@@ -17,8 +18,8 @@
         android:layout_below="@+id/editText2"
         android:layout_centerHorizontal="true" />
 
-    <ImageButton
-        android:id="@+id/refreshButton"
+    <com.bamless.chromiumsweupdater.ui.AnimatedImageButton
+        android:id="@+id/checkUpdateButton"
         android:layout_width="60dp"
         android:layout_height="60dp"
         android:background="?attr/selectableItemBackgroundBorderless"
@@ -27,7 +28,8 @@
         app:srcCompat="@drawable/refresh"
         android:layout_marginTop="39dp"
         android:layout_below="@+id/imageView"
-        android:layout_centerHorizontal="true" />
+        android:layout_centerHorizontal="true"
+        custom:animation="@anim/rotate"/>
 
     <TextView
         android:id="@+id/editText2"
@@ -52,7 +54,7 @@
         android:text="@string/noUpdateText"
         android:textAlignment="center"
         android:textSize="16sp"
-        android:layout_below="@+id/refreshButton"
+        android:layout_below="@+id/checkUpdateButton"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
 

@@ -39,6 +39,7 @@ public class AnimatedImageButton extends AppCompatImageButton {
         } finally {
             a.recycle();
         }
+        defaultRepeatCount = animation.getRepeatCount();
     }
 
     public AnimatedImageButton(Context context) {
@@ -80,6 +81,11 @@ public class AnimatedImageButton extends AppCompatImageButton {
         this.animation = animation;
         invalidate();
         requestLayout();
+    }
+
+    public void setButtonAnimationRepeatcount(int repeatcount) {
+        animation.setRepeatCount(repeatcount);
+        defaultRepeatCount = repeatcount;
     }
 
     /**Returns the button's animation*/

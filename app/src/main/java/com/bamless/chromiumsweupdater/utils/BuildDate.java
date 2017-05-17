@@ -114,7 +114,7 @@ public class BuildDate implements Comparable<BuildDate> {
 
     @Override
     public int compareTo(@NonNull BuildDate o) {
-        int res = 0;
+        int res;
         if((res = year - o.year) != 0) return res;
         if((res = month - o.month) != 0) return res;
         if((res = day - o.day) != 0) return res;

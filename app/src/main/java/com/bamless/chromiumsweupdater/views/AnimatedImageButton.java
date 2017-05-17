@@ -69,7 +69,7 @@ public class AnimatedImageButton extends AppCompatImageButton {
         clearAnimation();
     }
 
-    /**Stops the current animation at the end of the current cycle. It is equivalent to set
+    /**Stops the button's animation at the end of the current cycle. It is equivalent to set
      * {@link Animation#setRepeatCount(int)} to 0.*/
     public void stopButtonAnimationSmooth() {
         animation.setRepeatCount(0);
@@ -83,6 +83,7 @@ public class AnimatedImageButton extends AppCompatImageButton {
         requestLayout();
     }
 
+    /**Set a new repeat count for the button's animation*/
     public void setButtonAnimationRepeatcount(int repeatcount) {
         animation.setRepeatCount(repeatcount);
         defaultRepeatCount = repeatcount;

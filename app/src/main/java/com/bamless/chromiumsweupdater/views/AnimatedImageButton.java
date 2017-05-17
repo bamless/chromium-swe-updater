@@ -19,6 +19,7 @@ import com.bamless.chromiumsweupdater.R;
  */
 public class AnimatedImageButton extends AppCompatImageButton {
     private Animation animation;
+    private int defaultRepeatCount;
 
     public AnimatedImageButton(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -34,6 +35,7 @@ public class AnimatedImageButton extends AppCompatImageButton {
                         + ". This attribute is mandatory.");
             animation = AnimationUtils.loadAnimation(context, a.
                     getResourceId(R.styleable.AnimatedImageButton_animation, 0));
+            defaultRepeatCount = animation.getRepeatCount();
         } finally {
             a.recycle();
         }
@@ -55,24 +57,21 @@ public class AnimatedImageButton extends AppCompatImageButton {
     /**Starts the button's animation (if not already started).*/
     public void startButtonAnimation() {
         Animation anim = getAnimation();
-        if(anim == null || !anim.hasStarted())
+        if(anim == null || !anim.hasStarted()) {
+            animation.setRepeatCount(defaultRepeatCount);
             startAnimation(animation);
+        }
     }
 
     /**Stops immediately any animation*/
     public void stopButtonAnimation() {
-        Animation anim = getAnimation();
-        if(anim != null)
-            clearAnimation();
+        clearAnimation();
     }
 
     /**Stops the current animation at the end of the current cycle. It is equivalent to set
      * {@link Animation#setRepeatCount(int)} to 0.*/
     public void stopButtonAnimationSmooth() {
-        Animation anim = getAnimation();
-        if(anim != null && anim.hasStarted()) {
-            anim.setRepeatCount(0);
-        }
+        animation.setRepeatCount(0);
     }
 
     /**Sets the button's animation that will be played on click or with {@link com.bamless.chromiumsweupdater.views.AnimatedImageButton#startButtonAnimation()}.*/

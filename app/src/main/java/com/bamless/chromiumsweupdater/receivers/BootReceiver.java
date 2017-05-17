@@ -1,4 +1,4 @@
-package com.bamless.chromiumsweupdater.updater;
+package com.bamless.chromiumsweupdater.receivers;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;

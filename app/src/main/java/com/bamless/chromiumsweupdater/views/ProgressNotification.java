@@ -1,4 +1,4 @@
-package com.bamless.chromiumsweupdater.ui;
+package com.bamless.chromiumsweupdater.views;
 
 import android.app.Activity;
 import android.app.NotificationManager;
@@ -12,7 +12,8 @@ import android.os.SystemClock;
 import android.support.v7.app.NotificationCompat;
 
 import com.bamless.chromiumsweupdater.R;
-import com.bamless.chromiumsweupdater.http.ProgressResponseBody;
+import com.bamless.chromiumsweupdater.network.ProgressResponseBody;
+import com.bamless.chromiumsweupdater.services.KillNotificationsService;
 
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;

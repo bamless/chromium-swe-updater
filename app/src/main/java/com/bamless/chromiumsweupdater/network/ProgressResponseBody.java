@@ -1,4 +1,4 @@
-package com.bamless.chromiumsweupdater.http;
+package com.bamless.chromiumsweupdater.network;
 
 import java.io.IOException;
 

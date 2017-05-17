@@ -1,4 +1,4 @@
-package com.bamless.chromiumsweupdater.updater;
+package com.bamless.chromiumsweupdater.services;
 
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -11,7 +11,8 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.NotificationCompat;
 import android.util.Log;
 
-import com.bamless.chromiumsweupdater.ui.MainActivity;
+import com.bamless.chromiumsweupdater.network.ChromiumUpdater;
+import com.bamless.chromiumsweupdater.MainActivity;
 import com.bamless.chromiumsweupdater.R;
 
 /**

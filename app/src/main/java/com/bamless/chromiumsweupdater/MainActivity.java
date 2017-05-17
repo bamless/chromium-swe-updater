@@ -1,4 +1,4 @@
-package com.bamless.chromiumsweupdater.ui;
+package com.bamless.chromiumsweupdater;
 
 import android.Manifest;
 import android.app.AlarmManager;
@@ -19,10 +19,11 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.bamless.chromiumsweupdater.R;
-import com.bamless.chromiumsweupdater.updater.AlarmReceiver;
-import com.bamless.chromiumsweupdater.updater.ChromiumUpdater;
-import com.bamless.chromiumsweupdater.utils.BuildDate;
+import com.bamless.chromiumsweupdater.views.AnimatedImageButton;
+import com.bamless.chromiumsweupdater.views.ProgressNotification;
+import com.bamless.chromiumsweupdater.receivers.AlarmReceiver;
+import com.bamless.chromiumsweupdater.network.ChromiumUpdater;
+import com.bamless.chromiumsweupdater.models.BuildDate;
 import com.bamless.chromiumsweupdater.utils.Constants;
 
 import java.util.Calendar;
@@ -36,7 +37,7 @@ public class MainActivity extends AppCompatActivity {
 
     /**Permission request code*/
     public final static int REQUEST_EXTERNAL_WRITE = 1;
-    /**Argument key. Boolean indicating whether to reset the {@link com.bamless.chromiumsweupdater.updater.AlarmReceiver}*/
+    /**Argument key. Boolean indicating whether to reset the {@link AlarmReceiver}*/
     public final static String ARG_START_ALARM_ON_OPEN = "startAlarmOnOpen";
 
     /**The progressNotification used to show download progress*/

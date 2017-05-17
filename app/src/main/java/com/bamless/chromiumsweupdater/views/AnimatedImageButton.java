@@ -1,4 +1,4 @@
-package com.bamless.chromiumsweupdater.ui;
+package com.bamless.chromiumsweupdater.views;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -75,7 +75,7 @@ public class AnimatedImageButton extends AppCompatImageButton {
         }
     }
 
-    /**Sets the button's animation that will be played on click or with {@link com.bamless.chromiumsweupdater.ui.AnimatedImageButton#startButtonAnimation()}.*/
+    /**Sets the button's animation that will be played on click or with {@link com.bamless.chromiumsweupdater.views.AnimatedImageButton#startButtonAnimation()}.*/
     public void setButtonAnimation(Animation animation) {
         stopButtonAnimation();
         this.animation = animation;

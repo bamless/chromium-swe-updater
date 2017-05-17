@@ -1,4 +1,4 @@
-package com.bamless.chromiumsweupdater.utils;
+package com.bamless.chromiumsweupdater.models;
 
 import android.support.annotation.NonNull;
 
@@ -14,7 +14,7 @@ public class BuildDate implements Comparable<BuildDate> {
     private int min = 0;
     private int sec = 0;
 
-    protected BuildDate() {
+    public BuildDate() {
     }
 
     public BuildDate(int day, int month, int year, int hour, int min, int sec) {

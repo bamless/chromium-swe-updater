@@ -21,23 +21,23 @@
                 android:resource="@xml/provider_paths"/>
         </provider>
 
-        <service android:name="com.bamless.chromiumsweupdater.ui.KillNotificationsService"></service>
-        <service android:name="com.bamless.chromiumsweupdater.updater.CheckUpdateService"></service>
+        <service android:name="com.bamless.chromiumsweupdater.services.KillNotificationsService"></service>
+        <service android:name="com.bamless.chromiumsweupdater.services.CheckUpdateService"></service>
 
-        <activity android:name="com.bamless.chromiumsweupdater.ui.MainActivity">
+        <activity android:name="com.bamless.chromiumsweupdater.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
-        <receiver android:name="com.bamless.chromiumsweupdater.updater.BootReceiver" android:enabled="true" android:exported="false">
+        <receiver android:name="com.bamless.chromiumsweupdater.receivers.BootReceiver" android:enabled="true" android:exported="false">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
             </intent-filter>
         </receiver>
 
-        <receiver android:name="com.bamless.chromiumsweupdater.updater.AlarmReceiver" android:enabled="true" android:exported="false">
+        <receiver android:name="com.bamless.chromiumsweupdater.receivers.AlarmReceiver" android:enabled="true" android:exported="false">
             <intent-filter>
                 <action android:name="android.intent.action.START_ALARM"/>
             </intent-filter>

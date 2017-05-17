@@ -1,9 +1,11 @@
-package com.bamless.chromiumsweupdater.updater;
+package com.bamless.chromiumsweupdater.receivers;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
+
+import com.bamless.chromiumsweupdater.services.CheckUpdateService;
 
 /**
  * Broadcast receiver that catches the "check for update" alarm, and launches the

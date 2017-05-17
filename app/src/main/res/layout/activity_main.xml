@@ -5,7 +5,7 @@
     xmlns:custom="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.bamless.chromiumsweupdater.ui.MainActivity"
+    tools:context="com.bamless.chromiumsweupdater.MainActivity"
     tools:layout_editor_absoluteY="81dp"
     tools:layout_editor_absoluteX="0dp">
     <ImageView
@@ -18,7 +18,7 @@
         android:layout_below="@+id/editText2"
         android:layout_centerHorizontal="true" />
 
-    <com.bamless.chromiumsweupdater.ui.AnimatedImageButton
+    <com.bamless.chromiumsweupdater.views.AnimatedImageButton
         android:id="@+id/checkUpdateButton"
         android:layout_width="60dp"
         android:layout_height="60dp"

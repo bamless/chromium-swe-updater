@@ -1,4 +1,4 @@
-package com.bamless.chromiumsweupdater.ui;
+package com.bamless.chromiumsweupdater.services;
 
 import android.app.NotificationManager;
 import android.app.Service;

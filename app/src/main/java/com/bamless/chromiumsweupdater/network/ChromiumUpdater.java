@@ -1,4 +1,4 @@
-package com.bamless.chromiumsweupdater.updater;
+package com.bamless.chromiumsweupdater.network;
 
 import android.app.Activity;
 import android.content.Context;
@@ -9,8 +9,7 @@ import android.os.Build;
 import android.support.v4.content.FileProvider;
 import android.util.Log;
 
-import com.bamless.chromiumsweupdater.http.ProgressResponseBody;
-import com.bamless.chromiumsweupdater.utils.BuildDate;
+import com.bamless.chromiumsweupdater.models.BuildDate;
 import com.bamless.chromiumsweupdater.utils.Constants;
 
 import java.io.File;

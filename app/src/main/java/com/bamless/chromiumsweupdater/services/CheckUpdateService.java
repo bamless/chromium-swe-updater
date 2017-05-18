@@ -39,12 +39,24 @@ public class CheckUpdateService extends Service {
         updater.checkForUpdate(new ChromiumUpdater.ReturnCallback<Boolean>() {
             @Override
             public void onReturn(Boolean returnValue) {
-                if(returnValue)
+                if(returnValue == null)
+                    showUpdateFailure();
+                else if(returnValue)
                     showUpdateNotification();
             }
         });
         Log.d(TAG, "notify update");
         return Service.START_STICKY;
+    }
+
+    private void showUpdateFailure() {
+        NotificationManager nm = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+        NotificationCompat.Builder notBuilder = getBasetNotification();
+        notBuilder.setContentTitle(getString(R.string.chromiumSwe))
+                .setContentText(getString(R.string.updateFailed));
+
+        nm.notify(NOTID, notBuilder.build());
     }
 
     private void showUpdateNotification() {
@@ -53,15 +65,20 @@ public class CheckUpdateService extends Service {
         Intent notificationIntent = MainActivity.createIntent(this, false);
         PendingIntent intent = PendingIntent.getActivity(this, 1, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-        NotificationCompat.Builder notBuilder = new NotificationCompat.Builder(this);
+        NotificationCompat.Builder notBuilder = getBasetNotification();
         notBuilder.setContentTitle(getString(R.string.newUpdateNotificationText))
                 .setContentText(getString(R.string.newUpdateNotificationContentText))
-                .setSmallIcon(R.mipmap.ic_update_black)
-                .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.chromiumsweupdater))
-                .setDefaults(-1 )
-                .setAutoCancel(true)
                 .setContentIntent(intent);
 
         nm.notify(NOTID, notBuilder.build());
+    }
+
+    private NotificationCompat.Builder getBasetNotification() {
+        NotificationCompat.Builder notBuilder = new NotificationCompat.Builder(this);
+        notBuilder.setSmallIcon(R.mipmap.ic_update_black)
+                .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.chromiumsweupdater))
+                .setDefaults(-1 )
+                .setAutoCancel(true);
+        return notBuilder;
     }
 }

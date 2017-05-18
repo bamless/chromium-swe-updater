@@ -15,6 +15,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -46,6 +47,9 @@ public class MainActivity extends AppCompatActivity {
     /**The button that checks the update on click*/
     @BindView(R.id.checkUpdateButton)
     protected AnimatedImageButton checkUpdateButton;
+    @BindView(R.id.updateStatusIcon)
+    protected AnimatedImageButton updateStatusIcon;
+
 
     /**
      * Creates the intent to start the {@link android.app.Activity}
@@ -94,10 +98,10 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    @OnClick(R.id.updateStatusText)
-    protected void startUpdateOnClick(final TextView v) {
-        v.setClickable(false);          //makes the text unclickable (can't start update while one is in progress)
-        progressNotification.start();   //start update notification
+    @OnClick(R.id.updateStatusIcon)
+    protected void startUpdateOnClick(final AnimatedImageButton b) {
+        b.setClickable(false);
+        progressNotification.start();
         //start the actual update
         cu.update(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), progressNotification, new ChromiumUpdater.ReturnCallback<Boolean>() {
             public void onReturn(Boolean returnValue) {
@@ -105,12 +109,17 @@ public class MainActivity extends AppCompatActivity {
                     updateStatusText();
                 else
                     updateFailed();
+                b.stopButtonAnimationSmooth();
             }
         });
     }
 
     /**Updates the status text*/
     private void updateStatusText() {
+        updateStatusText(null);
+    }
+    /**Updates the status text to string passed*/
+    private void updateStatusText(String message) {
         TextView updateStatusText = ButterKnife.findById(this, R.id.updateStatusText);
         BuildDate curr = cu.getInstalledBuildDate();
         BuildDate last = cu.getLatestBuildDate();
@@ -118,19 +127,20 @@ public class MainActivity extends AppCompatActivity {
         //If there is a new build
         if(curr.compareTo(last) < 0) {
             //Update text with new build info, change color, add underline and set update listener
-            String newBuildText = getResources().getString(R.string.newBuildText, last.dateToString());
+            String newBuildText = (message == null) ? getResources().getString(R.string.newBuildText, last.dateToString()) : message;
             updateStatusText.setText(newBuildText);
-            updateStatusText.setTextColor(Color.BLUE);
-            updateStatusText.setPaintFlags(updateStatusText.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
+            updateStatusText.setTextColor(Color.WHITE);
+            updateStatusText.setPaintFlags(updateStatusText.getPaintFlags() | Paint.FAKE_BOLD_TEXT_FLAG);
             //makes the text clickable to start update
-            updateStatusText.setClickable(true);
+            updateStatusIcon.setVisibility(View.VISIBLE);
+            updateStatusIcon.setClickable(true);
         } else {
             //There is no new build, reset color, underline and remove update listener
             updateStatusText.setText(R.string.noUpdateText);
-            updateStatusText.setTextColor(Color.GRAY);
-            updateStatusText.setPaintFlags(updateStatusText.getPaintFlags() & (~ Paint.UNDERLINE_TEXT_FLAG));
+            updateStatusText.setPaintFlags(updateStatusText.getPaintFlags() & (~ Paint.FAKE_BOLD_TEXT_FLAG));
+            updateStatusIcon.setVisibility(View.GONE);
             //makes the text unclickable (can't start update if there is none)
-            updateStatusText.setClickable(false);
+            updateStatusIcon.setClickable(false);
         }
     }
 
@@ -172,8 +182,8 @@ public class MainActivity extends AppCompatActivity {
     /**Called upon update failure*/
     private void updateFailed() {
         //the update failed, reset status text to last build available for download
-        Toast.makeText(MainActivity.this, R.string.updateFailed, Toast.LENGTH_SHORT).show();
         updateStatusText();
+        updateStatusText("Build update has failed!");
         //dismiss progress notification
         progressNotification.cancel();
     }

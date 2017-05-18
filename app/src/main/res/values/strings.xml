@@ -2,7 +2,7 @@
     <string name="app_name">Chromium SWE Updater</string>
     <string name="updateNotificationText">Updating</string>
     <string name="updateFailed">Update Failed</string>
-    <string name="newBuildText">New build available: Build %1$s\nClick here to download</string>
+    <string name="newBuildText">%1$s build is available</string>
     <string name="noUpdateText">No update available</string>
     <string name="titleText">Update Chromium SWE</string>
     <string name="newUpdateNotificationText">Chromium SWE new update</string>

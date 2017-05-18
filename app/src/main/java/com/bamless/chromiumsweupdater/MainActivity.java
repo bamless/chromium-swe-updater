@@ -88,12 +88,12 @@ public class MainActivity extends AppCompatActivity {
     protected void checkUpdateOnClick(final AnimatedImageButton b) {
         cu.checkForUpdate(new ChromiumUpdater.ReturnCallback<Boolean>() {
             public void onReturn(Boolean returnValue) {
+                b.stopButtonAnimationSmooth();
                 if(returnValue == null) {
                     Toast.makeText(MainActivity.this, R.string.updateFailed, Toast.LENGTH_SHORT).show();
                     return;
                 }
                 updateStatusText();
-                b.stopButtonAnimationSmooth();
             }
         });
     }

@@ -48,13 +48,6 @@ public class MainActivity extends AppCompatActivity {
     @BindView(R.id.checkUpdateButton)
     protected AnimatedImageButton checkUpdateButton;
 
-    /**{@link android.view.View.OnClickListener} to start the update*/
-    private View.OnClickListener startUpdateOnClickListener = new View.OnClickListener() {
-        public void onClick(final View v) {
-
-        }
-    };
-
     /**
      * Creates the intent to start the {@link android.app.Activity}
      * @param context the current {@link Context}

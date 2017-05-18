@@ -1,62 +1,73 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:custom="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:weightSum="6"
     tools:context="com.bamless.chromiumsweupdater.MainActivity"
     tools:layout_editor_absoluteY="81dp"
     tools:layout_editor_absoluteX="0dp">
-    <ImageView
-        android:id="@+id/imageView"
-        android:layout_width="192dp"
-        android:layout_height="192dp"
-        android:gravity="center"
-        app:srcCompat="@drawable/chromiumswe"
-        android:layout_marginTop="27dp"
-        android:layout_below="@+id/editText2"
-        android:layout_centerHorizontal="true" />
 
-    <com.bamless.chromiumsweupdater.views.AnimatedImageButton
-        android:id="@+id/checkUpdateButton"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
-        android:background="?attr/selectableItemBackgroundBorderless"
-        android:scaleType="fitCenter"
-        android:adjustViewBounds="true"
-        app:srcCompat="@drawable/refresh"
-        android:layout_marginTop="39dp"
-        android:layout_below="@+id/imageView"
-        android:layout_centerHorizontal="true"
-        custom:animation="@anim/rotate"/>
-
-    <TextView
-        android:id="@+id/editText2"
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="41dp"
-        android:ems="10"
-        android:inputType="textPersonName"
-        android:text="@string/titleText"
-        android:textAlignment="center"
-        android:textAppearance="@android:style/TextAppearance"
-        android:textSize="27sp"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+        android:layout_height="0dp"
+        android:layout_weight="4">
 
-    <TextView
-        android:id="@+id/updateStatusText"
+        <com.bamless.chromiumsweupdater.views.AnimatedImageButton
+            app:srcCompat="@drawable/refresh"
+            android:id="@+id/checkUpdateButton"
+            android:layout_width="125dp"
+            android:layout_height="125dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:scaleType="fitCenter"
+            android:adjustViewBounds="true"
+            android:layout_gravity="center"
+            custom:animation="@anim/rotate" />
+
+        <com.bamless.chromiumsweupdater.views.StretchedBackgroundView
+            app:srcCompat="@drawable/chromium"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:adjustViewBounds="true"
+            android:alpha=".3" />
+
+    </FrameLayout>
+
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="36dp"
-        android:text="@string/noUpdateText"
-        android:textAlignment="center"
-        android:textSize="16sp"
-        android:layout_below="@+id/checkUpdateButton"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:clickable="false" />
+        android:layout_height="0dp"
+        android:layout_weight="2"
+        android:background="@color/colorPrimary"
+        android:gravity="center_vertical">
 
-</RelativeLayout>
+        <TextView
+            android:id="@+id/updateStatusText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/noUpdateText"
+            android:textAlignment="center"
+            android:textSize="16sp"
+            android:textColor="@color/colorLightGray"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true" />
+
+        <com.bamless.chromiumsweupdater.views.AnimatedImageButton
+            app:srcCompat="@drawable/download"
+            android:id="@+id/updateStatusIcon"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:scaleType="fitCenter"
+            android:layout_marginTop="35dp"
+            android:layout_centerHorizontal="true"
+            android:visibility="gone"
+            custom:animation="@anim/fade" />
+
+    </RelativeLayout>
+
+</LinearLayout>

@@ -4,10 +4,7 @@ import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 
-/**
- * Created by streambinder on 18/05/17.
- */
-class StretchedBackgroundView extends android.support.v7.widget.AppCompatImageView {
+public class StretchedBackgroundView extends android.support.v7.widget.AppCompatImageView {
 
     public StretchedBackgroundView(Context context) {
         super(context);

@@ -51,17 +51,7 @@ public class MainActivity extends AppCompatActivity {
     /**{@link android.view.View.OnClickListener} to start the update*/
     private View.OnClickListener startUpdateOnClickListener = new View.OnClickListener() {
         public void onClick(final View v) {
-            v.setOnClickListener(null);     //remove the listener once update started
-            progressNotification.start();   //start update notification
-            //start the actual update
-            cu.update(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), progressNotification, new ChromiumUpdater.ReturnCallback<Boolean>() {
-                public void onReturn(Boolean returnValue) {
-                    if(returnValue)
-                        updateStatusText();
-                    else
-                        updateFailed();
-                }
-            });
+
         }
     };
 
@@ -112,6 +102,21 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    @OnClick(R.id.updateStatusText)
+    protected void startUpdateOnClick(final TextView v) {
+        v.setClickable(false);     //remove the listener once update started
+        progressNotification.start();   //start update notification
+        //start the actual update
+        cu.update(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), progressNotification, new ChromiumUpdater.ReturnCallback<Boolean>() {
+            public void onReturn(Boolean returnValue) {
+                if(returnValue)
+                    updateStatusText();
+                else
+                    updateFailed();
+            }
+        });
+    }
+
     /**Updates the status text*/
     private void updateStatusText() {
         TextView updateStatusText = ButterKnife.findById(this, R.id.updateStatusText);
@@ -126,12 +131,13 @@ public class MainActivity extends AppCompatActivity {
             updateStatusText.setTextColor(Color.BLUE);
             updateStatusText.setPaintFlags(updateStatusText.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
             //set onclick listener to start update
-            updateStatusText.setOnClickListener(startUpdateOnClickListener);
+            updateStatusText.setClickable(true);
         } else {
             //There is no new build, reset color, underline and remove update listener
             updateStatusText.setText(R.string.noUpdateText);
             updateStatusText.setTextColor(Color.GRAY);
             updateStatusText.setPaintFlags(updateStatusText.getPaintFlags() & (~ Paint.UNDERLINE_TEXT_FLAG));
+            updateStatusText.setClickable(false);
         }
     }
 

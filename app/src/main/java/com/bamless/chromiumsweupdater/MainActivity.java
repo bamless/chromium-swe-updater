@@ -15,16 +15,15 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bamless.chromiumsweupdater.models.BuildDate;
+import com.bamless.chromiumsweupdater.network.ChromiumUpdater;
+import com.bamless.chromiumsweupdater.receivers.AlarmReceiver;
+import com.bamless.chromiumsweupdater.utils.Constants;
 import com.bamless.chromiumsweupdater.views.AnimatedImageButton;
 import com.bamless.chromiumsweupdater.views.ProgressNotification;
-import com.bamless.chromiumsweupdater.receivers.AlarmReceiver;
-import com.bamless.chromiumsweupdater.network.ChromiumUpdater;
-import com.bamless.chromiumsweupdater.models.BuildDate;
-import com.bamless.chromiumsweupdater.utils.Constants;
 
 import java.util.Calendar;
 
@@ -97,7 +96,7 @@ public class MainActivity extends AppCompatActivity {
 
     @OnClick(R.id.updateStatusText)
     protected void startUpdateOnClick(final TextView v) {
-        v.setClickable(false);     //remove the listener once update started
+        v.setClickable(false);          //makes the text unclickable (can't start update while one is in progress)
         progressNotification.start();   //start update notification
         //start the actual update
         cu.update(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), progressNotification, new ChromiumUpdater.ReturnCallback<Boolean>() {
@@ -123,13 +122,14 @@ public class MainActivity extends AppCompatActivity {
             updateStatusText.setText(newBuildText);
             updateStatusText.setTextColor(Color.BLUE);
             updateStatusText.setPaintFlags(updateStatusText.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
-            //set onclick listener to start update
+            //makes the text clickable to start update
             updateStatusText.setClickable(true);
         } else {
             //There is no new build, reset color, underline and remove update listener
             updateStatusText.setText(R.string.noUpdateText);
             updateStatusText.setTextColor(Color.GRAY);
             updateStatusText.setPaintFlags(updateStatusText.getPaintFlags() & (~ Paint.UNDERLINE_TEXT_FLAG));
+            //makes the text unclickable (can't start update if there is none)
             updateStatusText.setClickable(false);
         }
     }

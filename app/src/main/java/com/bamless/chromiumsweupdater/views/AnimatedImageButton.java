@@ -57,8 +57,8 @@ public class AnimatedImageButton extends AppCompatImageButton {
 
     /**Starts the button's animation (if not already started).*/
     public void startButtonAnimation() {
-            animation.setRepeatCount(defaultRepeatCount);
-            startAnimation(animation);
+        animation.setRepeatCount(defaultRepeatCount);
+        startAnimation(animation);
     }
 
     /**Stops immediately any animation*/

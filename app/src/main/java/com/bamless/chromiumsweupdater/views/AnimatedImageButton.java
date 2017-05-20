@@ -57,11 +57,8 @@ public class AnimatedImageButton extends AppCompatImageButton {
 
     /**Starts the button's animation (if not already started).*/
     public void startButtonAnimation() {
-        Animation anim = getAnimation();
-        if(anim == null || !anim.hasStarted()) {
             animation.setRepeatCount(defaultRepeatCount);
             startAnimation(animation);
-        }
     }
 
     /**Stops immediately any animation*/
@@ -81,6 +78,10 @@ public class AnimatedImageButton extends AppCompatImageButton {
         this.animation = animation;
         invalidate();
         requestLayout();
+    }
+
+    public void setButtonAnimationListener(Animation.AnimationListener listener) {
+        animation.setAnimationListener(listener);
     }
 
     /**Set a new repeat count for the button's animation*/

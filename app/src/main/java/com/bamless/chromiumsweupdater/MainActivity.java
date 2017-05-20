@@ -16,6 +16,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.view.animation.Animation;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -86,9 +87,11 @@ public class MainActivity extends AppCompatActivity {
 
     @OnClick(R.id.checkUpdateButton)
     protected void checkUpdateOnClick(final AnimatedImageButton b) {
+        b.setClickable(false);
         cu.checkForUpdate(new ChromiumUpdater.ReturnCallback<Boolean>() {
             public void onReturn(Boolean returnValue) {
                 b.stopButtonAnimationSmooth();
+                b.setButtonAnimationListener(setClickableOnAnimEndListener(b));
                 if(returnValue == null) {
                     Toast.makeText(MainActivity.this, R.string.updateFailed, Toast.LENGTH_SHORT).show();
                     return;
@@ -202,6 +205,18 @@ public class MainActivity extends AppCompatActivity {
                 break;
         }
     }
+
+    private Animation.AnimationListener setClickableOnAnimEndListener(final AnimatedImageButton b) {
+        return new Animation.AnimationListener() {
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                b.setClickable(true);
+            }
+            public void onAnimationStart(Animation animation) {}
+            public void onAnimationRepeat(Animation animation) {}
+        };
+    }
+
 
     @Override
     protected void onDestroy() {

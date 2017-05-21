@@ -52,7 +52,7 @@
             android:text="@string/noUpdateText"
             android:textAlignment="center"
             android:textSize="16sp"
-            android:textColor="@color/colorLightGray"
+            android:textColor="@android:color/white"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true" />
 

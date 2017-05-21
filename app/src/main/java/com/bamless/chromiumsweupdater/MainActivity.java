@@ -6,7 +6,6 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Bundle;
 import android.os.Environment;
@@ -87,16 +86,17 @@ public class MainActivity extends AppCompatActivity {
 
     @OnClick(R.id.checkUpdateButton)
     protected void checkUpdateOnClick(final AnimatedImageButton b) {
+        updateStatusText(getResources().getString(R.string.updateCheckText));
         b.setClickable(false);
         cu.checkForUpdate(new ChromiumUpdater.ReturnCallback<Boolean>() {
             public void onReturn(Boolean returnValue) {
                 b.stopButtonAnimationSmooth();
                 b.setButtonAnimationListener(setClickableOnAnimEndListener(b));
                 if(returnValue == null) {
-                    Toast.makeText(MainActivity.this, R.string.updateFailed, Toast.LENGTH_SHORT).show();
-                    return;
+                    updateStatusText(getResources().getString(R.string.updateFailed));
+                } else {
+                    updateStatusText();
                 }
-                updateStatusText();
             }
         });
     }
@@ -124,21 +124,23 @@ public class MainActivity extends AppCompatActivity {
     /**Updates the status text to string passed*/
     private void updateStatusText(String message) {
         TextView updateStatusText = ButterKnife.findById(this, R.id.updateStatusText);
+        if (message != null) {
+            updateStatusText.setText(message);
+            return;
+        }
         BuildDate curr = cu.getInstalledBuildDate();
         BuildDate last = cu.getLatestBuildDate();
 
         //If there is a new build
         if(curr.compareTo(last) < 0) {
             //Update text with new build info, change color, add underline and set update listener
-            String newBuildText = (message == null) ? getResources().getString(R.string.newBuildText, last.dateToString()) : message;
-            updateStatusText.setText(newBuildText);
-            updateStatusText.setTextColor(Color.WHITE);
+            updateStatusText.setText(getResources().getString(R.string.newBuildText, last.dateToString()));
             updateStatusText.setPaintFlags(updateStatusText.getPaintFlags() | Paint.FAKE_BOLD_TEXT_FLAG);
             //makes the text clickable to start update
             updateStatusIcon.setVisibility(View.VISIBLE);
             updateStatusIcon.setClickable(true);
         } else {
-            //There is no new build, reset color, underline and remove update listener
+            //There is no new build, underline and remove update listener
             updateStatusText.setText(R.string.noUpdateText);
             updateStatusText.setPaintFlags(updateStatusText.getPaintFlags() & (~ Paint.FAKE_BOLD_TEXT_FLAG));
             updateStatusIcon.setVisibility(View.GONE);
@@ -186,7 +188,7 @@ public class MainActivity extends AppCompatActivity {
     private void updateFailed() {
         //the update failed, reset status text to last build available for download
         updateStatusText();
-        updateStatusText("Build update has failed!");
+        updateStatusText(getResources().getString(R.string.updateFailedText));
         //dismiss progress notification
         progressNotification.cancel();
     }

@@ -4,6 +4,8 @@
     <string name="updateFailed">Failed to check for update</string>
     <string name="newBuildText">%1$s build is available</string>
     <string name="noUpdateText">No update available</string>
+    <string name="updateCheckText">Checking for updates...</string>
+    <string name="updateFailedText">Update process has failed!</string>
     <string name="titleText">Update Chromium SWE</string>
     <string name="newUpdateNotificationText">Chromium SWE new update</string>
     <string name="newUpdateNotificationContentText">click for download</string>

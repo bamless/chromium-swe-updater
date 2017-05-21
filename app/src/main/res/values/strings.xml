@@ -12,4 +12,5 @@
     <string name="permDeniedError">You need to grant the permissions in order to download chromium</string>
     <string name="progressNotText">%1$d%% %2$s, %3$s remaining</string>
     <string name="chromiumSwe">Chromium SWE</string>
+    <string name="updateDownloadingText">Downloading the update...</string>
 </resources>

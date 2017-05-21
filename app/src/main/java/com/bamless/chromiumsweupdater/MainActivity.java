@@ -105,6 +105,7 @@ public class MainActivity extends AppCompatActivity {
     protected void startUpdateOnClick(final AnimatedImageButton b) {
         b.setClickable(false);
         progressNotification.start();
+        updateStatusText(getString(R.string.updateDownloadingText));
         //start the actual update
         cu.update(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), progressNotification, new ChromiumUpdater.ReturnCallback<Boolean>() {
             public void onReturn(Boolean returnValue) {
@@ -117,34 +118,36 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    /**Updates the status text*/
+    /**Updates the status text for a new build.*/
     private void updateStatusText() {
         updateStatusText(null);
     }
-    /**Updates the status text to string passed*/
+    /**Updates the status text to string passed. If no string is passed then check for new build
+     * and update text accordingly.*/
     private void updateStatusText(String message) {
         TextView updateStatusText = ButterKnife.findById(this, R.id.updateStatusText);
         if (message != null) {
             updateStatusText.setText(message);
             return;
         }
+
         BuildDate curr = cu.getInstalledBuildDate();
         BuildDate last = cu.getLatestBuildDate();
 
         //If there is a new build
         if(curr.compareTo(last) < 0) {
-            //Update text with new build info, change color, add underline and set update listener
+            //Update text with new build info and set it bold
             updateStatusText.setText(getResources().getString(R.string.newBuildText, last.dateToString()));
             updateStatusText.setPaintFlags(updateStatusText.getPaintFlags() | Paint.FAKE_BOLD_TEXT_FLAG);
-            //makes the text clickable to start update
+            //enable the button to start the update
             updateStatusIcon.setVisibility(View.VISIBLE);
             updateStatusIcon.setClickable(true);
         } else {
-            //There is no new build, underline and remove update listener
+            //There is no new build, reset status text to "no new build" and remove bold
             updateStatusText.setText(R.string.noUpdateText);
             updateStatusText.setPaintFlags(updateStatusText.getPaintFlags() & (~ Paint.FAKE_BOLD_TEXT_FLAG));
+            //disable the button that starts the update
             updateStatusIcon.setVisibility(View.GONE);
-            //makes the text unclickable (can't start update if there is none)
             updateStatusIcon.setClickable(false);
         }
     }

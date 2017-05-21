@@ -91,10 +91,10 @@ public class ProgressNotification implements ProgressResponseBody.ProgressListen
 
     @Override
     public void update(long bytesRead, long contentLength, boolean done) {
-        int percent = (int) (((float) bytesRead / contentLength) * 100);
-        long elapsedTimeMillis = SystemClock.elapsedRealtime() - startTime;
-        float downRate = elapsedTimeMillis == 0 ? 0 : ((float) bytesRead / (elapsedTimeMillis / 1000f));
-        int timeRemaining = (int) ((double) (contentLength - bytesRead) / downRate);
+        final int percent = (int) (((float) bytesRead / contentLength) * 100);
+        final long elapsedTimeMillis = SystemClock.elapsedRealtime() - startTime;
+        final float downRate = (elapsedTimeMillis == 0) ? 0 : ((float) bytesRead / (elapsedTimeMillis / 1000.f));
+        final int timeRemaining = (int) ((float) (contentLength - bytesRead) / downRate);
 
         if(canUpdate()){
             notBuilder.setProgress(100, percent, false);

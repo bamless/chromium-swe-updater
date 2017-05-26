@@ -180,6 +180,8 @@ public class ChromiumUpdater {
                     .getPackageName() + ".provider", apk);
             context.grantUriPermission("com.android.packageinstaller", uri,
                     Intent.FLAG_GRANT_WRITE_URI_PERMISSION | Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            context.grantUriPermission("com.google.android.packageinstaller", uri,
+                    Intent.FLAG_GRANT_WRITE_URI_PERMISSION | Intent.FLAG_GRANT_READ_URI_PERMISSION);
         } else {
             uri = Uri.fromFile(apk);
         }

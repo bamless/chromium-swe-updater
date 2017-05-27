@@ -86,14 +86,14 @@ public class MainActivity extends AppCompatActivity {
 
     @OnClick(R.id.checkUpdateButton)
     protected void checkUpdateOnClick(final AnimatedImageButton b) {
-        updateStatusText(getResources().getString(R.string.updateCheckText));
+        setStatusText(getResources().getString(R.string.updateCheckText));
         b.setClickable(false);
         cu.checkForUpdate(new ChromiumUpdater.ReturnCallback<Boolean>() {
             public void onReturn(Boolean returnValue) {
                 b.stopButtonAnimationSmooth();
                 b.setButtonAnimationListener(setClickableOnAnimEndListener(b));
                 if(returnValue == null) {
-                    updateStatusText(getResources().getString(R.string.updateFailed));
+                    setStatusText(getResources().getString(R.string.updateFailed));
                 } else {
                     updateStatusText();
                 }
@@ -104,8 +104,9 @@ public class MainActivity extends AppCompatActivity {
     @OnClick(R.id.updateStatusIcon)
     protected void startUpdateOnClick(final AnimatedImageButton b) {
         b.setClickable(false);
+        checkUpdateButton.setClickable(false);
         progressNotification.start();
-        updateStatusText(getString(R.string.updateDownloadingText));
+        setStatusText(getString(R.string.updateDownloadingText));
         //start the actual update
         cu.update(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), progressNotification, new ChromiumUpdater.ReturnCallback<Boolean>() {
             public void onReturn(Boolean returnValue) {
@@ -114,22 +115,22 @@ public class MainActivity extends AppCompatActivity {
                 else
                     updateFailed();
                 b.stopButtonAnimationSmooth();
+                checkUpdateButton.setClickable(true);
             }
         });
     }
 
-    /**Updates the status text for a new build.*/
-    private void updateStatusText() {
-        updateStatusText(null);
-    }
-    /**Updates the status text to string passed. If no string is passed then check for new build
-     * and update text accordingly.*/
-    private void updateStatusText(String message) {
+
+    /**Sets the status text to the string passed as input*/
+    private void setStatusText(String message) {
         TextView updateStatusText = ButterKnife.findById(this, R.id.updateStatusText);
-        if (message != null) {
-            updateStatusText.setText(message);
-            return;
-        }
+        updateStatusText.setText(message);
+    }
+
+    /**Automatically set the status text by checking if a new build is present. If there is
+     * then display the build info ad set the download button.*/
+    private void updateStatusText() {
+        TextView updateStatusText = ButterKnife.findById(this, R.id.updateStatusText);
 
         BuildDate curr = cu.getInstalledBuildDate();
         BuildDate last = cu.getLatestBuildDate();
@@ -154,8 +155,7 @@ public class MainActivity extends AppCompatActivity {
 
     /**Checks for the WRITE permission on the external storage. If not present it asks for it*/
     private void checkPermissions() {
-        int canRead =  ContextCompat.checkSelfPermission(this,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        int canRead =  ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
         if(canRead != PackageManager.PERMISSION_GRANTED)
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_EXTERNAL_WRITE);
@@ -190,8 +190,7 @@ public class MainActivity extends AppCompatActivity {
     /**Called upon update failure*/
     private void updateFailed() {
         //the update failed, reset status text to last build available for download
-        updateStatusText();
-        updateStatusText(getResources().getString(R.string.updateFailedText));
+        setStatusText(getResources().getString(R.string.updateFailedText));
         //dismiss progress notification
         progressNotification.cancel();
     }

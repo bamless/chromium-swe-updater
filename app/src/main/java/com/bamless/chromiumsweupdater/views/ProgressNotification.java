@@ -57,7 +57,7 @@ public class ProgressNotification implements ProgressResponseBody.ProgressListen
                 .setContentText("0%")
                 .setOngoing(true)
                 .setLargeIcon(BitmapFactory.decodeResource(ctx.getResources(), R.drawable.chromiumsweupdater64px))
-                .setSmallIcon(R.mipmap.ic_update_black);
+                .setSmallIcon(android.R.drawable.stat_sys_download);
         //init notification progress to 0
         notBuilder.setProgress(100, 0, false);
         /*init the service used to dismiss the notification upon app closure. This is necessary

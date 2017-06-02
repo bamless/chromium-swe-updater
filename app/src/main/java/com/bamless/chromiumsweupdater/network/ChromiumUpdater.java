@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Handler;
 import android.support.v4.content.FileProvider;
 import android.util.Log;
 
@@ -46,9 +47,11 @@ public class ChromiumUpdater {
     private ProgressResponseBody.ProgressListener progressListener;
     private OkHttpClient http;
     private Context context;
+    private Handler handler;
 
     public ChromiumUpdater(Context context) {
         this.context = context;
+        handler = new Handler();
         init();
     }
 
@@ -84,14 +87,14 @@ public class ChromiumUpdater {
             @Override
             public void onFailure(Call call, IOException e) {
                 Log.e(TAG, "Failed to check the update", e);
-                returnOnUIThread(returnCallback, null);
+                returnOnCallingThread(returnCallback, null);
             }
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 if(response == null) {
                     Log.e(TAG, "Failed to check the update");
-                    returnOnUIThread(returnCallback, null);
+                    returnOnCallingThread(returnCallback, null);
                     return;
                 }
 
@@ -100,9 +103,9 @@ public class ChromiumUpdater {
 
                 if(currBuild.compareTo(buildFromRepo) < 0) {
                     setLatestBuildDate(buildFromRepo);
-                    returnOnUIThread(returnCallback, true);
+                    returnOnCallingThread(returnCallback, true);
                 } else {
-                    returnOnUIThread(returnCallback, false);
+                    returnOnCallingThread(returnCallback, false);
                 }
             }
         });
@@ -135,14 +138,14 @@ public class ChromiumUpdater {
             @Override
             public void onFailure(Call call, IOException e) {
                 Log.e(TAG, "Failed to download file: ", e);
-                returnOnUIThread(returnCallback, false);
+                returnOnCallingThread(returnCallback, false);
             }
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 if (!response.isSuccessful()) {
                     Log.d(TAG,"Failed to download file: " + response);
-                    returnOnUIThread(returnCallback, false);
+                    returnOnCallingThread(returnCallback, false);
                     return;
                 }
 
@@ -153,7 +156,7 @@ public class ChromiumUpdater {
                     sink.writeAll(response.body().source());
                 } catch (IOException e) {
                     Log.e(TAG, "Error while writing the file", e);
-                    returnOnUIThread(returnCallback, false);
+                    returnOnCallingThread(returnCallback, false);
                     return;
                 } finally {
                     if(sink != null) sink.close();
@@ -164,7 +167,7 @@ public class ChromiumUpdater {
                 //update last installation time and latest build time
                 setInstalledBuildDate(getLatestBuildDate());
 
-                returnOnUIThread(returnCallback, true);
+                returnOnCallingThread(returnCallback, true);
             }
         });
     }
@@ -225,17 +228,13 @@ public class ChromiumUpdater {
      * Runs the returncallback on the UI thread if the context passed at instantiation is a
      * {@link Activity}
      */
-    private <T> void returnOnUIThread(final ReturnCallback<T> returnCallback, final T value) {
-        if(context instanceof Activity) {
-            ((Activity) context).runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    returnCallback.onReturn(value);
-                }
-            });
-        } else {
-            returnCallback.onReturn(value);
-        }
+    private <T> void returnOnCallingThread(final ReturnCallback<T> returnCallback, final T value) {
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                returnCallback.onReturn(value);
+            }
+        });
     }
 
     private void setProgressListener(ProgressResponseBody.ProgressListener progressListener) {

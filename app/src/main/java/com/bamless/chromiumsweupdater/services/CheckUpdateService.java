@@ -39,10 +39,13 @@ public class CheckUpdateService extends Service {
         updater.checkForUpdate(new ChromiumUpdater.ReturnCallback<Boolean>() {
             @Override
             public void onReturn(Boolean returnValue) {
-                if(returnValue == null)
+                if(returnValue == null) {
                     showUpdateFailure();
-                else if(returnValue)
+                } else if(returnValue) {
                     showUpdateNotification();
+                }
+
+                stopSelf();
             }
         });
         Log.d(TAG, "notify update");

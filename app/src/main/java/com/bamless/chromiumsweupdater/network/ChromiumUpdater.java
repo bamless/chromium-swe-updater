@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Handler;
 import android.support.v4.content.FileProvider;
 import android.util.Log;
 
@@ -66,8 +67,8 @@ public class ChromiumUpdater {
 
     /**
      * It checks if an update is available (asynchronously) from the repo updating the date of the
-     * latest build available. The returncallback's method gets called on the UI thread if the context
-     * passed at instan tiation is an {@link Activity}. This method should be called before
+     * latest build available. The returncallback's method gets called in the calling thread as a
+     * post runnable using a {@link Handler}. This method should be called before
      * {@link ChromiumUpdater#update(File, ProgressResponseBody.ProgressListener, ReturnCallback)}
      * is called.
      * @param returnCallback Callback for returning a value. It returns true if there is an update,
@@ -80,18 +81,19 @@ public class ChromiumUpdater {
                 .url(REPO + BUILD_FILE)
                 .get().build();
 
+        final Handler handler = new Handler();
         http.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
                 Log.e(TAG, "Failed to check the update", e);
-                returnOnUIThread(returnCallback, null);
+                returnOnCallingThread(handler, returnCallback, null);
             }
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 if(response == null) {
                     Log.e(TAG, "Failed to check the update");
-                    returnOnUIThread(returnCallback, null);
+                    returnOnCallingThread(handler, returnCallback, null);
                     return;
                 }
 
@@ -100,17 +102,17 @@ public class ChromiumUpdater {
 
                 if(currBuild.compareTo(buildFromRepo) < 0) {
                     setLatestBuildDate(buildFromRepo);
-                    returnOnUIThread(returnCallback, true);
+                    returnOnCallingThread(handler, returnCallback, true);
                 } else {
-                    returnOnUIThread(returnCallback, false);
+                    returnOnCallingThread(handler, returnCallback, false);
                 }
             }
         });
     }
 
     /**
-     * Downloads and install the latest Chromium SWE apk (asynchronously). returncallback's method gets
-     * called on the UI thread if the context passed at instantiation is an {@link Activity}.
+     * Downloads and install the latest Chromium SWE apk (asynchronously). The returncallback's method 
+     * gets called in the calling thread as a post runnable using a {@link Handler}.
      * If the latest build date fetched is not newer than the build installed, the function do not
      * execute and fails.
      * @param downloadPath The patch to which the apk will be downloaded
@@ -131,18 +133,19 @@ public class ChromiumUpdater {
                             .url(REPO + CHROMIUM_SWE_APK)
                             .get().build();
 
+        final Handler handler = new Handler();
         http.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
                 Log.e(TAG, "Failed to download file: ", e);
-                returnOnUIThread(returnCallback, false);
+                returnOnCallingThread(handler, returnCallback, false);
             }
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 if (!response.isSuccessful()) {
                     Log.d(TAG,"Failed to download file: " + response);
-                    returnOnUIThread(returnCallback, false);
+                    returnOnCallingThread(handler, returnCallback, false);
                     return;
                 }
 
@@ -153,7 +156,7 @@ public class ChromiumUpdater {
                     sink.writeAll(response.body().source());
                 } catch (IOException e) {
                     Log.e(TAG, "Error while writing the file", e);
-                    returnOnUIThread(returnCallback, false);
+                    returnOnCallingThread(handler, returnCallback, false);
                     return;
                 } finally {
                     if(sink != null) sink.close();
@@ -164,7 +167,7 @@ public class ChromiumUpdater {
                 //update last installation time and latest build time
                 setInstalledBuildDate(getLatestBuildDate());
 
-                returnOnUIThread(returnCallback, true);
+                returnOnCallingThread(handler, returnCallback, true);
             }
         });
     }
@@ -225,17 +228,13 @@ public class ChromiumUpdater {
      * Runs the returncallback on the UI thread if the context passed at instantiation is a
      * {@link Activity}
      */
-    private <T> void returnOnUIThread(final ReturnCallback<T> returnCallback, final T value) {
-        if(context instanceof Activity) {
-            ((Activity) context).runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    returnCallback.onReturn(value);
-                }
-            });
-        } else {
-            returnCallback.onReturn(value);
-        }
+    private <T> void returnOnCallingThread(Handler handler, final ReturnCallback<T> returnCallback, final T value) {
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                returnCallback.onReturn(value);
+            }
+        });
     }
 
     private void setProgressListener(ProgressResponseBody.ProgressListener progressListener) {
